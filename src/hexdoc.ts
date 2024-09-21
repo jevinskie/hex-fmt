@@ -6,6 +6,12 @@ export class HexDocument {
     private _statusBarItem: StatusBarItem;
     private _size: number;
 
+    constructor() {
+        this._hexLines = [];
+        this._statusBarItem = window.createStatusBarItem();
+        this._size = NaN;
+    }
+
     public updateStatusBar() {
 
         // Create as needed
@@ -59,8 +65,10 @@ export class HexDocument {
                 let sel = new Selection(pos, pos);
                 
                 // Set the new position
-                editor.selection = sel;
-                return true;
+                if (editor !== undefined) {
+                    editor.selection = sel;
+                    return true;
+                }
             }
         }
 
@@ -71,6 +79,9 @@ export class HexDocument {
 
         // Create the workspace edit
         let workspaceEdit = new WorkspaceEdit();
+        if (window.activeTextEditor === undefined) {
+            return 0;
+        }
         let doc = window.activeTextEditor.document;
         let edits = [];
 

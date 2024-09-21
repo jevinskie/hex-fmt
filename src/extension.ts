@@ -2,7 +2,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import {window, workspace, commands, Disposable, ExtensionContext} from 'vscode';
-import {HexDocument} from './hexdoc'
+import {HexDocument} from './hexdoc';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -14,30 +14,33 @@ export function activate(context: ExtensionContext) {
 
     var seekDisposable = commands.registerCommand('extension.hexFind', () => {
         // Check this is a .hex file
-        if(window.activeTextEditor.document.languageId != "hex")
+        if(window.activeTextEditor?.document.languageId !== "hex")
         {
             window.showErrorMessage("This command is only available with \".hex\" files.");
             return;
         }
 
         // Display a message box to the user
-        window.showInputBox({prompt: 'Type an adress to find'}).then(val => {
+        window.showInputBox({prompt: 'Type an address to find'}).then(val => {
+            if (val === undefined) {
+                return;
+            }
             let address = parseInt(val);
-            if(address === NaN || address < 0) {
+            if(Number.isNaN(address) || address < 0) {
                 window.showErrorMessage("Wrong address format.");
                 return;
             }
 
             // Go to the address
             if (!hexDoc.goToAddress(address)) {
-                window.showWarningMessage("The address 0x" + address.toString(16) + " was not found.")
+                window.showWarningMessage("The address 0x" + address.toString(16) + " was not found.");
             }
         });
     });
 
     var repairDisposable = commands.registerCommand('extension.repairHex', () => {
         // Check this is a .hex file
-        if(window.activeTextEditor.document.languageId != "hex")
+        if(window.activeTextEditor?.document.languageId !== "hex")
         {
             window.showErrorMessage("This command is only available with \".hex\" files.");
             return;
@@ -94,7 +97,7 @@ class HexDocumentController {
 
     private _onSave() {
         // Check this is an .hex file
-        if(window.activeTextEditor.document.languageId === "hex" &&
+        if(window.activeTextEditor?.document.languageId === "hex" &&
             workspace.getConfiguration("hex-fmt").get("repairOnSave", false)) {
             // Repair and save if needed
             if(this._hexDoc.repair() > 0)

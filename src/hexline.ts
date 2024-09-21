@@ -8,10 +8,10 @@ var TYPES = {
     STARTSEGADDRESS: 0x03,
     EXTLINADDRESS: 0x04,
     STARTLINADDRESS: 0x05
-}
+};
 
 // Header length = ':' + data length (2) + address (4) + type (2)
-var HEADERLENGTH = 9
+var HEADERLENGTH = 9;
 
 export class HexLine {
     startCode: string;
@@ -29,6 +29,10 @@ export class HexLine {
         // Initialize variables
         this._correctHdr = false;
         this._byteSum = 0;
+        this.startCode = "";
+        this.nbData = NaN;
+        this.address = NaN;
+        this.hexType = NaN;
 
         if(offset) {
             this._addOffset = offset;
@@ -47,9 +51,9 @@ export class HexLine {
             this.hexType = this.parseAndUpdateChk(hexString, 3);
 
             this._correctHdr = (this.startCode === ':' &&
-                this.nbData != NaN &&
-                this.address != NaN &&
-                this.hexType != NaN &&
+                !Number.isNaN(this.nbData) &&
+                !Number.isNaN(this.address) &&
+                !Number.isNaN(this.hexType) &&
                 TYPES.DATA <= this.hexType && this.hexType <= TYPES.STARTLINADDRESS);
         }
 
@@ -107,7 +111,7 @@ export class HexLine {
             let relative = (character - HEADERLENGTH) / 2;
             if(relative >= 0)
             {
-                relative = Math.trunc(relative)
+                relative = Math.trunc(relative);
                 if (relative < this.nbData) {
                     return relative + this.address + this._addOffset;
                 }
@@ -149,11 +153,11 @@ export class HexLine {
     }
 
     public isBroken() : boolean {
-        if (this._correctHdr && (this.nbData == this.data.length))
+        if (this._correctHdr && (this.nbData === this.data.length))
         {
-            return this.computedChk() != this.checksum;
+            return this.computedChk() !== this.checksum;
         }
-        return true
+        return true;
     }
 
     public repair() : boolean {
